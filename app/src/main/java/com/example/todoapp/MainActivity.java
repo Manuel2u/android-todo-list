@@ -20,6 +20,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_ADD_TODO = 1;
+
     private ListView listView;
     private ArrayAdapter<TodoItem> adapter;
     private List<TodoItem> todoItems;
@@ -28,9 +30,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //setSupportActionBar(findViewById(R.id.toolbar));
-        //getSupportActionBar().setTitle("TodoList");
 
         listView = findViewById(R.id.listView);
 
@@ -72,16 +71,29 @@ public class MainActivity extends AppCompatActivity {
 
     private void openAddEditScreen() {
         Intent intent = new Intent(MainActivity.this, AddEditTodoActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_ADD_TODO);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ADD_TODO && resultCode == RESULT_OK && data != null) {
+            TodoItem newTodoItem = data.getParcelableExtra("todoItem");
+            if (newTodoItem != null) {
+                todoItems.add(newTodoItem);
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     private List<TodoItem> getTodoItems() {
         List<TodoItem> items = new ArrayList<>();
 
         // Add custom items to the list
-        items.add(new TodoItem("Task 1", false));
-        items.add(new TodoItem("Task 2", true));
-        items.add(new TodoItem("Task 3", false));
+        items.add(new TodoItem("Add GraphQL Resolvers", false));
+        items.add(new TodoItem("Watch The Flash", true));
+        items.add(new TodoItem("Finish Reading Arsene Lupin", false));
         // Add more items as needed
 
         return items;
